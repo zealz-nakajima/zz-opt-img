@@ -1,33 +1,84 @@
-<?php
-if (isset($_FILES["f"])) {
-    $file = $_FILES["f"];
-    define('SAVE_FOLDER', "./tmp/");
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>タイトル</title>
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <script src="//code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+</head>
+<body>
 
-    if ($file["error"] == 0) {
-        if ($file["type"] == "image/jpeg") {
-            $img_size_m = filesize($file["tmp_name"]);
-            exec("jpegoptim --strip-all --max=80 -t " . realpath($file["tmp_name"]));
+<div class="container">
+    <div class="col-md-10 col-sm-12">
+        <div class="page-header">
+            <h1 id="container">Compress Image</h1>
+        </div>
 
-            $save_path = uniqid() . "__" . $file["name"];
-            copy($file["tmp_name"], SAVE_FOLDER . $save_path);
+        <script>
+            $(function () {
+                if (window.File && window.FileReader && window.FileList && window.Blob) {
+                    // アップロードするファイルを選択
+                    $('input[type=file]').change(function () {
+                        // 1. 選択されたファイルがない場合は何もせずにreturn
+                        if (!this.files.length) {
+                            return;
+                        }
+                        var fd = $(this).parent('form').get()[0];
+                        var formdata = new FormData(fd);
+                        $.ajax({
+                            type: 'POST',
+                            url: "/compress-image.php",
+                            cache: false,
+                            dataType: 'html',
+                            data: formdata,
+                            processData: false,
+                            contentType: false,
+                            success: function (data, textStatus, jqXHR) {
+                                $("#results").append(data);
+                            }
+                        });
+                    });
 
-            $img_size_a = filesize(SAVE_FOLDER . $save_path);
-            $avg        = number_format(round($img_size_m / 1000)) . "KB => " . number_format(round($img_size_a / 1000)) . "KB : " . (100 - (round(($img_size_a / $img_size_m) * 100, 2))) . "%(" . number_format(round(($img_size_m - $img_size_a) / 1024)) . "KB削減)";
-        } elseif ($file["type"] == "image/png") {
-            $img_size_m = filesize($file["tmp_name"]);
-            $ret        = exec("optipng -o2 " . realpath($file["tmp_name"]));
+                } else {
+                    alert('The File APIs are not fully supported in this browser.');
+                }
 
-            $save_path = uniqid() . "__" . $file["name"];
-            copy($file["tmp_name"], SAVE_FOLDER . $save_path);
+            });
+        </script>
+        jpgとPNGのみ。
+        <form id="form1" method="post" action="./compress-image.php" enctype="multipart/form-data">
+            <input type="file" name="f"/>
+            <input type="submit">
+        </form>
+        <div id="results"></div>
+    </div>
+</div>
+</body>
+</html>
 
-            $img_size_a = filesize(SAVE_FOLDER . $save_path);
-            $avg        = number_format(round($img_size_m / 1000)) . "KB => " . number_format(round($img_size_a / 1000)) . "KB : " . (100 - (round(($img_size_a / $img_size_m) * 100, 2))) . "%(" . (round(($img_size_m - $img_size_a) / 1024)) . "KB削減)";
-        }
-    }
-}
 
-if ( ! empty($save_path)) {
-    $img = base64_encode(file_get_contents(SAVE_FOLDER . $save_path));
-
-    echo '<a href="down.php?f=' . $save_path . '"><img src="data:' . $file["type"] . ';base64,' . $img . '" style="max-width: 120px" /></a>' . "<br />" . $avg;
-}
+<script>
+    $(document).ready(function () {
+        var $form, fd;
+        $("#form1").submit(function () {
+            console.log("a");
+            $form = $(this);
+            console.log($form[0]);
+            fd = new FormData($form[0]);
+            console.log(fd);
+            $.ajax($form.attr("action"), {
+                type: "POST",
+                data: fd,
+                success: function (msg) {
+                    alert("Data Saved: " + msg);
+                }
+            });
+            return false;
+        });
+    });
+</script>
