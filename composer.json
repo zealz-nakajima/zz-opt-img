@@ -1,0 +1,25 @@
+{
+	"name": "zealz-nakajima/zz-opt-img",
+	"type": "project",
+	"description": "",
+	"keywords": [
+		"application",
+		"website",
+		"development",
+		"framework",
+		"PHP"
+	],
+	"license": "MIT",
+	"require": {
+		"php": "~7.0.0",
+		"ext-mbstring": "*"
+	},
+	"require-dev": {},
+	"provide": {
+		"php": "*",
+		"ext-memcached": "*",
+		"ext-mbstring": "*",
+		"ext-apcu": "*"
+	},
+	"minimum-stability": "stable"
+}
