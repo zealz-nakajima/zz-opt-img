@@ -2,13 +2,7 @@
 	"name": "zealz-nakajima/zz-opt-img",
 	"type": "project",
 	"description": "",
-	"keywords": [
-		"application",
-		"website",
-		"development",
-		"framework",
-		"PHP"
-	],
+	"keywords": [],
 	"license": "MIT",
 	"require": {
 		"php": "~7.0.0",
